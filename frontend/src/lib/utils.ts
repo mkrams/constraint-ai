@@ -52,6 +52,6 @@ export function getConstraintLabel(
 }
 
 export function calculateMarginPercentage(result: EvaluationResult): number {
-  if (result.limit_value === 0) return 0;
+  if (!result.limit_value || !result.margin) return 0;
   return Math.min(100, Math.max(0, (result.margin / 100) * 100));
 }

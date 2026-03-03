@@ -92,7 +92,7 @@ export function ConstraintDetail({
           <div className="pt-2 border-t border-[#1e1e2e]">
             <div className="text-xs text-[#8888a0]">Evaluation</div>
             <div className="font-mono-values text-sm text-[#e0e0e8] mt-1">
-              {evaluation.message}
+              {evaluation.message ?? "No message"}
             </div>
           </div>
         )}

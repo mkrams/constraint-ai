@@ -7,7 +7,8 @@ interface MarginBarProps {
 }
 
 export function MarginBar({ result, height = 8 }: MarginBarProps) {
-  const percentage = Math.min(100, Math.max(0, result.margin));
+  const margin = result.margin ?? 0;
+  const percentage = Math.min(100, Math.max(0, margin));
   const color = getStatusColor(result.status);
 
   return (
@@ -15,7 +16,7 @@ export function MarginBar({ result, height = 8 }: MarginBarProps) {
       <div className="flex justify-between text-xs">
         <span className="text-gray-400">Margin</span>
         <span className="font-mono-values font-semibold" style={{ color }}>
-          {result.margin.toFixed(1)}%
+          {margin.toFixed(1)}%
         </span>
       </div>
       <div className="w-full bg-gray-900 rounded-full overflow-hidden" style={{ height }}>

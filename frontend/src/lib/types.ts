@@ -39,11 +39,11 @@ export interface Trace {
 export interface EvaluationResult {
   constraint_id: string;
   status: "pass" | "fail" | "warning" | "unknown";
-  actual_value: number;
-  limit_value: number;
-  margin: number;
-  margin_absolute: number;
-  message: string;
+  actual_value: number | null;
+  limit_value: number | null;
+  margin: number | null;
+  margin_absolute: number | null;
+  message: string | null;
 }
 
 export interface EvaluationResponse {
