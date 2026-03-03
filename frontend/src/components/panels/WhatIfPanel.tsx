@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Parameter, EvaluationResult } from "@/lib/types";
+import { Parameter, EvaluationResult, WhatIfConstraint } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatNumber } from "@/lib/utils";
-import { X } from "lucide-react";
+import { explainWhatIfImpact, getTransitionColor, getTransitionLabel } from "@/lib/explain";
+import { X, AlertTriangle, CheckCircle, ArrowRight, TrendingUp, TrendingDown } from "lucide-react";
 
 interface WhatIfPanelProps {
   parameters: Parameter[];
@@ -25,6 +25,8 @@ export function WhatIfPanel({
 
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoadingLocal] = useState(false);
+  const [summary, setSummary] = useState<string>("");
+  const [feasible, setFeasible] = useState<boolean>(true);
 
   const currentParam = parameters.find((p) => p.id === whatIfParameterId);
 
@@ -42,7 +44,26 @@ export function WhatIfPanel({
     try {
       if (whatIfParameterId) {
         const response = await api.whatIf(whatIfParameterId, value);
-        setWhatIfResults(response.directly_affected_constraints);
+        setWhatIfResults(response.affected_constraints);
+        setFeasible(response.feasible);
+
+        const failingCount = response.affected_constraints.filter(
+          (c) => c.current_status !== "fail" && c.proposed_status === "fail"
+        ).length;
+        const passingCount = response.affected_constraints.filter(
+          (c) => c.current_status === "fail" && c.proposed_status !== "fail"
+        ).length;
+
+        const explanation = explainWhatIfImpact(
+          currentParam?.name ?? "parameter",
+          currentParam?.value ?? 0,
+          value,
+          currentParam?.unit ?? "",
+          response.affected_constraints.length,
+          failingCount,
+          passingCount
+        );
+        setSummary(explanation);
       }
     } catch (error) {
       console.error("What-if analysis failed:", error);
@@ -57,7 +78,6 @@ export function WhatIfPanel({
     setLoadingLocal(true);
     try {
       await api.updateParameter(whatIfParameterId, whatIfValue);
-      // Refresh all data
       const [items, constraints] = await Promise.all([
         api.getItems(),
         api.getConstraints(),
@@ -68,7 +88,6 @@ export function WhatIfPanel({
         parameters: items.flatMap((i) => i.parameters),
       });
       clearWhatIf();
-      // Re-evaluate
       const evaluation = await api.evaluateAll();
       useStore.setState({ evaluationResults: evaluation.results });
     } catch (error) {
@@ -80,11 +99,17 @@ export function WhatIfPanel({
 
   if (!whatIfParameterId || !currentParam) {
     return (
-      <div className="text-center py-8 text-[#8888a0]">
-        Select a parameter to begin what-if analysis
+      <div className="space-y-4 p-2">
+        <div className="text-center py-8 text-[#8888a0]">
+          <p className="mb-2">Select a parameter to begin what-if analysis.</p>
+          <p className="text-xs">Click a constraint, then use the &quot;What-If&quot; buttons to explore how parameter changes affect the system.</p>
+        </div>
       </div>
     );
   }
+
+  const delta = whatIfValue !== null ? whatIfValue - currentParam.value : 0;
+  const pctChange = currentParam.value !== 0 ? ((delta / currentParam.value) * 100) : 0;
 
   return (
     <div className="space-y-4 animate-fadeIn">
@@ -99,32 +124,49 @@ export function WhatIfPanel({
         </button>
       </div>
 
-      {/* Parameter Info */}
-      <div className="card">
-        <div className="text-xs text-[#8888a0] mb-1">{currentParam.name}</div>
-        <div className="font-mono-values font-semibold text-[#e0e0e8]">
-          Current: {formatNumber(currentParam.value)} {currentParam.unit}
+      {/* Parameter Card */}
+      <div className="card space-y-2">
+        <div className="text-xs text-[#8888a0] uppercase tracking-wider">Adjusting</div>
+        <div className="text-sm font-semibold text-[#e0e0e8]">{currentParam.name}</div>
+        <div className="flex items-center gap-3">
+          <div>
+            <div className="text-xs text-[#8888a0]">Current</div>
+            <div className="font-mono-values font-semibold text-[#e0e0e8]">
+              {formatNumber(currentParam.value)} {currentParam.unit}
+            </div>
+          </div>
+          {whatIfValue !== null && whatIfValue !== currentParam.value && (
+            <>
+              <ArrowRight size={14} className="text-[#6c5ce7]" />
+              <div>
+                <div className="text-xs text-[#8888a0]">Proposed</div>
+                <div className="font-mono-values font-semibold" style={{ color: feasible ? "#00b894" : "#e74c3c" }}>
+                  {formatNumber(whatIfValue)} {currentParam.unit}
+                </div>
+              </div>
+              <div className="ml-auto flex items-center gap-1">
+                {delta > 0 ? <TrendingUp size={12} className="text-[#6c5ce7]" /> : <TrendingDown size={12} className="text-[#6c5ce7]" />}
+                <span className="text-xs font-mono-values text-[#8888a0]">
+                  {delta > 0 ? "+" : ""}{formatNumber(delta)} ({pctChange > 0 ? "+" : ""}{pctChange.toFixed(1)}%)
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Value Slider */}
+      {/* Value Controls */}
       <div className="space-y-2">
-        <div className="flex gap-2">
-          <input
-            type="range"
-            min={currentParam.value * 0.5}
-            max={currentParam.value * 1.5}
-            step={currentParam.value * 0.01}
-            value={whatIfValue !== null ? whatIfValue : currentParam.value}
-            onChange={(e) => handleValueChange(parseFloat(e.target.value))}
-            className="flex-1"
-            style={{
-              accentColor: "#6c5ce7",
-            }}
-          />
-        </div>
-
-        {/* Numeric Input */}
+        <input
+          type="range"
+          min={currentParam.value * 0.5}
+          max={currentParam.value * 1.5}
+          step={currentParam.value * 0.01}
+          value={whatIfValue !== null ? whatIfValue : currentParam.value}
+          onChange={(e) => handleValueChange(parseFloat(e.target.value))}
+          className="w-full"
+          style={{ accentColor: "#6c5ce7" }}
+        />
         <div className="flex gap-2">
           <input
             type="number"
@@ -132,39 +174,33 @@ export function WhatIfPanel({
             onChange={(e) => {
               setInputValue(e.target.value);
               const num = parseFloat(e.target.value);
-              if (!isNaN(num)) {
-                handleValueChange(num);
-              }
+              if (!isNaN(num)) handleValueChange(num);
             }}
             className="input flex-1"
             step="0.1"
           />
-          <span className="text-[#6c5ce7] font-semibold px-2 py-1">
+          <span className="text-[#6c5ce7] font-semibold px-2 py-1 text-sm">
             {currentParam.unit}
           </span>
         </div>
       </div>
 
-      {/* Impact Summary */}
-      {whatIfResults && (
-        <div className="card space-y-2">
-          <div className="text-xs text-[#8888a0] uppercase tracking-wider">
-            Impact
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <div className="text-sm font-bold text-[#e0e0e8]">
-                {whatIfResults.length}
-              </div>
-              <div className="text-xs text-[#8888a0]">Affected</div>
-            </div>
-            <div>
-              <div className="text-sm font-bold text-[#e74c3c]">
-                {whatIfResults.filter((r) => r.status === "fail").length}
-              </div>
-              <div className="text-xs text-[#8888a0]">Would Fail</div>
-            </div>
-          </div>
+      {/* NL Summary */}
+      {summary && (
+        <div
+          className="p-3 rounded text-sm leading-relaxed"
+          style={{
+            backgroundColor: feasible ? "rgba(0, 184, 148, 0.08)" : "rgba(231, 76, 60, 0.08)",
+            borderLeft: `3px solid ${feasible ? "#00b894" : "#e74c3c"}`,
+            color: "#d0d0d8",
+          }}
+        >
+          {feasible ? (
+            <CheckCircle size={14} className="inline mr-2 text-[#00b894]" style={{ marginTop: -2 }} />
+          ) : (
+            <AlertTriangle size={14} className="inline mr-2 text-[#e74c3c]" style={{ marginTop: -2 }} />
+          )}
+          {summary}
         </div>
       )}
 
@@ -172,20 +208,43 @@ export function WhatIfPanel({
       {whatIfResults && whatIfResults.length > 0 && (
         <div>
           <div className="text-xs text-[#8888a0] uppercase tracking-wider mb-2">
-            Affected Constraints
+            Affected Constraints ({whatIfResults.length})
           </div>
-          <div className="space-y-1 max-h-40 overflow-y-auto">
-            {whatIfResults.map((result) => (
-              <div
-                key={result.constraint_id}
-                className="card text-xs p-2 flex items-center justify-between"
-              >
-                <span className="text-[#d0d0d8] truncate">
-                  {result.constraint_id.slice(0, 8)}...
-                </span>
-                <StatusBadge status={result.status} size="sm" />
-              </div>
-            ))}
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {whatIfResults.map((result: WhatIfConstraint) => {
+              const transColor = getTransitionColor(result.current_status, result.proposed_status);
+              const transLabel = getTransitionLabel(result.current_status, result.proposed_status);
+              return (
+                <div
+                  key={result.constraint_id}
+                  className="card p-3 space-y-1"
+                  style={{ borderLeftColor: transColor, borderLeftWidth: 3 }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[#e0e0e8]">
+                      {result.constraint_name}
+                    </span>
+                    <span
+                      className="text-xs font-semibold px-2 py-0.5 rounded"
+                      style={{
+                        backgroundColor: `${transColor}15`,
+                        color: transColor,
+                      }}
+                    >
+                      {transLabel}
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#8888a0]">
+                    {result.message}
+                  </div>
+                  {result.margin !== null && (
+                    <div className="text-xs font-mono-values" style={{ color: transColor }}>
+                      Margin: {result.margin.toFixed(1)}%
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -194,11 +253,7 @@ export function WhatIfPanel({
       <div className="space-y-2 pt-2 border-t border-[#1e1e2e]">
         <button
           onClick={handleApplyChange}
-          disabled={
-            loading ||
-            whatIfValue === null ||
-            whatIfValue === currentParam.value
-          }
+          disabled={loading || whatIfValue === null || whatIfValue === currentParam.value}
           className="button w-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Applying..." : "Apply Change"}

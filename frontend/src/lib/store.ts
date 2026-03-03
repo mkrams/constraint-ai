@@ -5,6 +5,7 @@ import {
   Trace,
   Constraint,
   EvaluationResult,
+  WhatIfConstraint,
 } from "./types";
 
 interface AppStore {
@@ -27,7 +28,7 @@ interface AppStore {
   whatIfMode: boolean;
   whatIfParameterId: string | null;
   whatIfValue: number | null;
-  whatIfResults: EvaluationResult[] | null;
+  whatIfResults: WhatIfConstraint[] | null;
 
   // Health
   healthStatus: {
@@ -53,7 +54,7 @@ interface AppStore {
   // What-If Actions
   setWhatIfMode: (enabled: boolean) => void;
   setWhatIfParameter: (parameterId: string | null, value: number | null) => void;
-  setWhatIfResults: (results: EvaluationResult[] | null) => void;
+  setWhatIfResults: (results: WhatIfConstraint[] | null) => void;
   clearWhatIf: () => void;
 
   // Health Actions

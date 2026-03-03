@@ -54,18 +54,26 @@ export interface EvaluationResponse {
   results: EvaluationResult[];
 }
 
+/** What the backend /what-if endpoint actually returns */
+export interface WhatIfConstraint {
+  constraint_id: string;
+  constraint_name: string;
+  rule_type: string;
+  current_status: string;
+  proposed_status: string;
+  message: string;
+  margin: number | null;
+  margin_absolute: number | null;
+}
+
 export interface WhatIfResponse {
   parameter_id: string;
-  proposed_value: number;
+  parameter_name: string;
   current_value: number;
-  directly_affected_constraints: EvaluationResult[];
-  newly_failing: EvaluationResult[];
-  newly_passing: EvaluationResult[];
-  summary: {
-    total_affected: number;
-    would_fail: number;
-    would_pass: number;
-  };
+  proposed_value: number;
+  feasible: boolean;
+  message: string;
+  affected_constraints: WhatIfConstraint[];
 }
 
 export interface HealthResponse {
