@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+.next/
+out/
+dist/
+
+# Database
+*.db
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Generated docs
+backend/QUICKSTART.md
+backend/README.md
+backend/START_HERE.md
+backend/IMPLEMENTATION_SUMMARY.md
+backend/DELIVERY_SUMMARY.txt
+backend/FILE_MANIFEST.txt
+backend/VERIFICATION.txt
+backend/PROJECT_COMPLETE.md
+frontend/QUICKSTART.md
+frontend/README.md
+frontend/IMPLEMENTATION_SUMMARY.md
+frontend/PROJECT_COMPLETE.md
