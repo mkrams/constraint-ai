@@ -15,14 +15,19 @@ async def lifespan(app: FastAPI):
     init_db()
     print("Database initialized")
 
-    # Auto-seed if database is empty (first deploy)
-    if os.getenv("AUTO_SEED", "false").lower() == "true":
+    # Auto-seed: run if empty OR if FORCE_RESEED is set
+    auto_seed = os.getenv("AUTO_SEED", "false").lower() == "true"
+    force_reseed = os.getenv("FORCE_RESEED", "false").lower() == "true"
+
+    if auto_seed or force_reseed:
         from app.database import SessionLocal
         from app.models.models import Item
         db = SessionLocal()
         try:
-            if db.query(Item).count() == 0:
-                print("Empty database detected, running seed...")
+            item_count = db.query(Item).count()
+            if item_count == 0 or force_reseed:
+                reason = "FORCE_RESEED enabled" if force_reseed else "Empty database detected"
+                print(f"{reason}, running seed...")
                 db.close()
                 import subprocess
                 subprocess.run(["python", "seed.py"], check=True)
