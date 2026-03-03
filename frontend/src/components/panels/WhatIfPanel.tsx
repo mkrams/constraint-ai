@@ -15,7 +15,6 @@ interface WhatIfPanelProps {
 
 export function WhatIfPanel({
   parameters,
-  evaluationResults,
 }: WhatIfPanelProps) {
   const whatIfParameterId = useStore((s) => s.whatIfParameterId);
   const whatIfValue = useStore((s) => s.whatIfValue);
@@ -23,8 +22,6 @@ export function WhatIfPanel({
   const setWhatIfParameter = useStore((s) => s.setWhatIfParameter);
   const setWhatIfResults = useStore((s) => s.setWhatIfResults);
   const clearWhatIf = useStore((s) => s.clearWhatIf);
-  const setLoading = useStore((s) => s.setLoading);
-  const updateParameter = useStore((s) => s.setParameters);
 
   const [inputValue, setInputValue] = useState<string>("");
   const [loading, setLoadingLocal] = useState(false);

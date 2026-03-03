@@ -4,7 +4,7 @@ import { Constraint, EvaluationResult, Item, Parameter } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MarginBar } from "@/components/ui/MarginBar";
-import { getRuleSymbol, formatNumber, getDomainColor } from "@/lib/utils";
+import { getRuleSymbol, formatNumber } from "@/lib/utils";
 import { useState } from "react";
 
 interface ConstraintDetailProps {

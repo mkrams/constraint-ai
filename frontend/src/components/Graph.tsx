@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import ReactFlow, {
   Node,
   Edge,
@@ -39,16 +39,6 @@ export function Graph({
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { fitView } = useReactFlow();
-
-  // Create a mapping from parameter ID to constraint
-  const parameterToConstraint = useMemo(() => {
-    const map = new Map<string, Constraint>();
-    constraints.forEach((constraint) => {
-      map.set(constraint.source_parameter_id, constraint);
-      map.set(constraint.target_parameter_id, constraint);
-    });
-    return map;
-  }, [constraints]);
 
   // Create nodes and edges with dagre layout
   useEffect(() => {

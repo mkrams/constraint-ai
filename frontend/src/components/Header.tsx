@@ -1,9 +1,7 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { api } from "@/lib/api";
 import { Activity, Zap } from "lucide-react";
-import { useState } from "react";
 
 interface HeaderProps {
   onEvaluateAll: () => Promise<void>;

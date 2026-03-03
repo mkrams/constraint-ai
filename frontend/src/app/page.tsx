@@ -18,7 +18,6 @@ export default function Home() {
   const traces = useStore((s) => s.traces);
   const constraints = useStore((s) => s.constraints);
   const evaluationResults = useStore((s) => s.evaluationResults);
-  const loading = useStore((s) => s.loading);
   const error = useStore((s) => s.error);
 
   const setItems = useStore((s) => s.setItems);
@@ -37,13 +36,12 @@ export default function Home() {
         setLoading(true);
         setError(null);
 
-        const [itemsData, tracesData, constraintsData, evaluationData, healthData] =
+        const [itemsData, tracesData, constraintsData, evaluationData] =
           await Promise.all([
             api.getItems(),
             api.getTraces(),
             api.getConstraints(),
             api.evaluateAll(),
-            api.getHealth(),
           ]);
 
         setItems(itemsData);

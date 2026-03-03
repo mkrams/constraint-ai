@@ -31,7 +31,7 @@ export function LeftPanel({ items, evaluationResults }: LeftPanelProps) {
           items
             .find((i) => i.id === item.id)
             ?.parameters.some(
-              (p) =>
+              (_p) =>
                 // Would need constraint data to properly check, for now just check if evaluation exists
                 true
             )
