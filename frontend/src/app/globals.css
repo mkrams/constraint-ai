@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e1e2e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a3e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: #0a0a0f;
+  color: #e0e0e8;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.react-flow__node {
+  border-radius: 8px;
+  background-color: #1a1a28;
+  border: 2px solid #1e1e2e;
+}
+
+.react-flow__node.selected {
+  border: 2px solid #6c5ce7;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__handle {
+  background-color: #6c5ce7;
+}
+
+.react-flow__handle.connectable {
+  cursor: grab;
+}
+
+.react-flow__background {
+  background-color: #0a0a0f;
+}
+
+.react-flow__minimap-mask {
+  fill: #12121a;
+}
+
+/* Scrollable areas */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Monospace for numbers and values */
+.font-mono-values {
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Smooth transitions */
+.transition-colors {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.transition-all {
+  transition: all 0.2s ease;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-pass {
+  background-color: rgba(0, 184, 148, 0.1);
+  color: #00b894;
+  border: 1px solid rgba(0, 184, 148, 0.3);
+}
+
+.badge-fail {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.badge-warning {
+  background-color: rgba(243, 156, 18, 0.1);
+  color: #f39c12;
+  border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.badge-unknown {
+  background-color: rgba(136, 136, 160, 0.1);
+  color: #8888a0;
+  border: 1px solid rgba(136, 136, 160, 0.3);
+}
+
+/* Panel styles */
+.panel {
+  background-color: #12121a;
+  border: 1px solid #1e1e2e;
+  border-radius: 8px;
+}
+
+.panel-header {
+  padding: 1rem;
+  border-bottom: 1px solid #1e1e2e;
+  background-color: #0a0a0f;
+}
+
+.panel-content {
+  padding: 1rem;
+}
+
+/* Card styles */
+.card {
+  background-color: #1a1a28;
+  border: 1px solid #1e1e2e;
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.card:hover {
+  background-color: #20202e;
+  border-color: #2a2a3e;
+}
+
+.card.selected {
+  background-color: #2a2a3e;
+  border-color: #6c5ce7;
+}
+
+/* Input styles */
+.input {
+  background-color: #1a1a28;
+  border: 1px solid #1e1e2e;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #e0e0e8;
+  font-size: 0.875rem;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.input:hover {
+  border-color: #2a2a3e;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+}
+
+/* Button styles */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #7e6ce0;
+}
+
+.button:active {
+  background-color: #5a4acd;
+}
+
+.button:disabled {
+  background-color: #2a2a3e;
+  color: #8888a0;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background-color: #1a1a28;
+  color: #e0e0e8;
+  border: 1px solid #1e1e2e;
+}
+
+.button-secondary:hover {
+  background-color: #20202e;
+  border-color: #2a2a3e;
+}
+
+.button-small {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in;
+}
