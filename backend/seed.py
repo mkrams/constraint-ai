@@ -4,7 +4,7 @@ Creates a power distribution system with components, parameters, traces, and con
 """
 
 from app.database import SessionLocal, init_db
-from app.models.models import Item, Parameter, Trace, Constraint, ConstraintSource
+from app.models.models import Item, Parameter, Trace, Constraint, ConstraintSource, EvaluationResult
 from datetime import datetime
 
 
@@ -14,9 +14,10 @@ def seed_database():
     db = SessionLocal()
 
     try:
-        # Clear existing data
-        db.query(Constraint).delete()
+        # Clear existing data (order matters — children first)
+        db.query(EvaluationResult).delete()
         db.query(ConstraintSource).delete()
+        db.query(Constraint).delete()
         db.query(Trace).delete()
         db.query(Parameter).delete()
         db.query(Item).delete()
